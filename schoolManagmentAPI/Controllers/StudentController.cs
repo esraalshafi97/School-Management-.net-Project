@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using school.Services;
 using schoolManagmentAPI.Data.Entities;
 using schoolManagmentAPI.Models;
+using schoolManagmentAPI.Services;
 
 namespace schoolManagmentAPI.Controllers
 {
@@ -16,20 +17,23 @@ namespace schoolManagmentAPI.Controllers
         readonly ILogger<StudentController> _logger;
         private readonly ISchoolRepository _schoolRepository;
         private readonly IMapper _mapper;
+        private readonly ImageService _imageService;
 
 
         public StudentController(ILogger<StudentController> logger,
             ISchoolRepository schoolRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ImageService imageService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _schoolRepository = schoolRepository ?? throw new ArgumentNullException(nameof(schoolRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         }
         [HttpGet()]
-        public async Task<ActionResult<List<SubjectDto>>> getAllSubjects()
+        public async Task<ActionResult<List<StudentDto>>> getAllStudents()
         {
-            var result = await _schoolRepository.GetSubjectsAsync();
+            var result = await _schoolRepository.GetStudentsAsync();
 
 
             if (result == null)
@@ -39,18 +43,19 @@ namespace schoolManagmentAPI.Controllers
                 return NotFound();
 
             }
-            return Ok(_mapper.Map<IEnumerable<SubjectDto>>(result));
+            return Ok(_mapper.Map<IEnumerable<StudentDto>>(result));
 
         }
         
-        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<SubjectDto>> AddSubject(SubjectCreation data)
+        public async Task<ActionResult<StudentDto>> AddStudent(StudentOfCreation data)
         {
+           String imagePath= await _imageService.UploadImage(data.Image);
 
-            var finaldata = _mapper.Map<Subject>(data);
+            var finaldata = _mapper.Map<Student>(data);
+            finaldata.Image = imagePath;
 
-            _schoolRepository.AddSubject(
+            _schoolRepository.AddStudent(
                finaldata);
             await _schoolRepository.SaveChangesAsync();
 
@@ -58,19 +63,19 @@ namespace schoolManagmentAPI.Controllers
 
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{id}")]
 
-        public async Task<ActionResult> DeleteSubject(int id)
+        public async Task<ActionResult> DeleteStudentt(int id)
         {
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var data = await _schoolRepository.GetSubject(id);
+            var data = await _schoolRepository.GetStudent(id);
 
-            _schoolRepository.DeleteSubject(data);
+            _schoolRepository.DeleteStudent(data);
 
             _schoolRepository.SaveChangesAsync();
 

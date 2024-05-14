@@ -1,12 +1,12 @@
-﻿namespace schoolManagmentAPI.Data.Entities
-{
+﻿using schoolManagmentAPI.Data.Entities;
 
-    public class Student
+namespace schoolManagmentAPI.Models
+{
+    public class StudentDto
     {
         public int StudentId { get; set; }
         public string Name { get; set; }
         public string? Image { get; set; }
-
         public int? ClassroomId { get; set; }
 
         // Navigation properties

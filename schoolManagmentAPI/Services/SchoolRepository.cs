@@ -54,6 +54,11 @@ namespace school.Services
             return await _schoolContext.Subjects.OrderBy(c => c.Name).ToListAsync();
         }
 
+        public async Task<IEnumerable<Student>> GetStudentsAsync()
+        {
+            return await _schoolContext.Students.OrderBy(c => c.Name).ToListAsync();
+        }
+
         public async Task<Teacher?> GetTeacherForSubjectAsync(int SubjectId, int TeacherId)
         {
             return await _schoolContext.Teachers.Where(c => c.SubjectId == TeacherId && c.SubjectId == SubjectId).FirstOrDefaultAsync();
@@ -98,6 +103,7 @@ namespace school.Services
             _schoolContext.Subjects.Add(subject);
         }
 
+
         public async Task<Subject> GetSubject(int subjectId)
         {
             return await _schoolContext.Subjects.FirstOrDefaultAsync(c => c.SubjectId == subjectId);
@@ -107,5 +113,20 @@ namespace school.Services
             return (await _schoolContext.SaveChangesAsync() >= 0);
         }
 
+        public void AddStudent(Student student)
+        {
+            _schoolContext.Students.Add(student);
+        }
+
+        public async Task<Student> GetStudent(int studentId)
+        {
+            return await _schoolContext.Students.FirstOrDefaultAsync(c => c.StudentId == studentId);
+
+        }
+
+        public void DeleteStudent(Student student)
+        {
+            _schoolContext.Students.Remove(student);
+        }
     }
 }
